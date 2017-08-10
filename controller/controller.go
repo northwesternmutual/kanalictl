@@ -25,11 +25,11 @@ import (
 	"io/ioutil"
 	"path/filepath"
 
+	"github.com/ghodss/yaml"
 	"github.com/northwesternmutual/kanali/controller"
 	"github.com/northwesternmutual/kanali/spec"
 	"github.com/northwesternmutual/kanalictl/utils"
 	"github.com/northwesternmutual/kanalictl/validation"
-	"github.com/ghodss/yaml"
 	"k8s.io/kubernetes/pkg/api/unversioned"
 )
 

@@ -27,10 +27,10 @@ import (
 	"os"
 	"strings"
 
+	"github.com/gosuri/uitable"
 	"github.com/northwesternmutual/kanali/controller"
 	"github.com/northwesternmutual/kanali/spec"
 	"github.com/northwesternmutual/kanalictl/utils"
-	"github.com/gosuri/uitable"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 )

@@ -27,11 +27,11 @@ import (
 	"os"
 	"strings"
 
+	"github.com/ghodss/yaml"
+	"github.com/gosuri/uitable"
 	"github.com/northwesternmutual/kanali/controller"
 	"github.com/northwesternmutual/kanali/spec"
 	"github.com/northwesternmutual/kanalictl/utils"
-	"github.com/ghodss/yaml"
-	"github.com/gosuri/uitable"
 	"github.com/spf13/cobra"
 )
 

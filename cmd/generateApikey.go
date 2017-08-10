@@ -34,10 +34,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/northwesternmutual/kanali/spec"
 	"github.com/Sirupsen/logrus"
 	"github.com/fatih/color"
 	"github.com/ghodss/yaml"
+	"github.com/northwesternmutual/kanali/spec"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"k8s.io/kubernetes/pkg/api"
