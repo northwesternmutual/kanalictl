@@ -1,0 +1,14 @@
+vendor/
+kanalictl
+kanalictl_*
+.vscode
+*debug.test*
+*.pem
+apikey.yaml
+apikey.yml
+apikey.json
+examples/
+*.out
+.cover/
+*.log
+kanalictl.yaml
