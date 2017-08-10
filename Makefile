@@ -64,6 +64,7 @@ install_ci: install
 	go get golang.org/x/tools/cmd/cover
 	go get github.com/golang/lint/golint
 	go get github.com/kisielk/errcheck
+	go get github.com/mitchellh/gox
 
 .PHONY: test_ci
 test_ci:

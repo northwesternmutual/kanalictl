@@ -5,9 +5,23 @@ language: go
 go:
 - 1.8
 
+env:
+  global:
+  - AWS_DEFAULT_REGION=us-east-1
+  - S3_BASE_PATH=s3://kanalictl/release
+  - secure: hPQd1Tobytheqw5dc0EzRc1PHiYuwSBZ131xFxcNyCX+SVKc/RHj+HI/G3KzccuRcqHyQtekcMY6dZOOK3rpzHoQmAF/kFUYIRpouA+l/nrNr6MRpyYoklUIzME1FwktfgsiA+97M/FJ/9zjItk2sOMtP6SibLRAup5jX+XuvRdY5amt0WzvQ556YCJ1K2JYqWjki0nhp2hGsgFt6PPdhr/P3wMDFmZyMD8uLLPCg3Y11IY/8nxRVPDb4b62/98FNkDtCYOp4aU1p2/m9V8jZgt4mguWOWpY7rnyp7Sbk5BL6qhxI4eFkTejItLpArC3oqocKS51BnHNWiiQcJqe4fij6mzGdptcSRe5F8MhIUl+j3s1rklkt3gPcjBpgNhbDH1rLVrBv7oDCJ/2bv+aRNidQO9qjh9NTBiHTC+j99tFV70K9GAebD05LHAoswg7m61PtKBw9LX2Ml6desgJBGeYIhiKUTP+L4LkBrs8QltM7v0T2hOhIFgHg0biI8NuAqDa29eQjLOcSzpJ8bJTIFXfGh8EikOvLWCHoD/VTGXu8mRa9HhpKJJZ5IkvA3a0aGZCvVS+rL/guJC4zgxGM8vGNqEydLbVNPhyA/YVWYLNbz+Q7X2vcARgpnwENJGTX7V0Jhdm0V1pLFsI6uuICcbK4i0UybGAhrjVIEA5jeE=
+  - secure: Kmji0VbFYNvcpveCxPpeChxAfW3kbmcO4NNkGpwLDp+pdA7uPORSOZ3JvM2fRWgeJ/86ESKys75eoXgs/nu1/RUdK975a9vIOGUcSRXQ6iBv046KlHEEn8IXpdl81O21leEyAZWQCwAQga/2PabIyvUP3bu6BO8gJ1W9i1RiIKg4ByDcMo8+m+k5YjV7Ph+YhxxDtNHjuVWgtHHm2dgPsx3lPTdslrxnCykMLWVtfm3UiVaB8QYHbyfiJEtDgrbnMKSZudMpq/FteVpbFx560fyakKGYaY2iuQIPHv+H6abbYdMyJVeevTbvM+PJMeoqjHMdZcMGG251DGz3ixYVRwv2fl5gKdhRsut7PBxnXkeeoxBrc7oLxmWRCa6ldMppWhAuflY13xHeEOTQqyAMB2xLbD/qcg7PuFuW8+E0iNral2a5cOfuLnkZXpw2765vYWRH9WVS7cltd8rvo5aTS2P508DfLKeUFGgrv36IxojFLzxmqAWPUxHhHxOyna/hnbyVdMOSTzJ1IGy1BsRJYj3ZdIfiz4yBl5spnfngkM6Z6MkS3c6yElIVKDQBtqIrf0qVb6Mo59wxw4sc6My5dBq2NiyYG7hSzQZb2v/6E75yDAEF4Ndx0Dzg1wTQAwy2xrc96hKCouERlWlJmCNodwdot3qoWphA2BUq91tL8Vk=
+
 install:
 - make install_ci
+- curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+- unzip awscli-bundle.zip
+- ./awscli-bundle/install -b ~/bin/aws
+- export PATH=~/bin:$PATH
 
 script:
 - make test_ci
 - travis_retry goveralls -coverprofile=cover.out -service=travis-ci || true
+
+after_success:
+- bash ./travis/upload-binaries.sh
