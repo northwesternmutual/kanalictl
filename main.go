@@ -21,7 +21,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/spf13/viper"
 	"os"
 
@@ -33,10 +32,7 @@ func init() {
 	viper.AddConfigPath(".")
 	viper.AddConfigPath("$HOME/.kanalictl/")
 	viper.AddConfigPath("/etc/kanalictl/")
-	if err := viper.ReadInConfig(); err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
+	viper.ReadInConfig()
 }
 
 func main() {

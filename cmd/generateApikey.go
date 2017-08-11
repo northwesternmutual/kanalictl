@@ -106,7 +106,7 @@ var generateAPIKeyCmd = &cobra.Command{
 		apiKeyStruct := spec.APIKey{
 			TypeMeta: unversioned.TypeMeta{
 				APIVersion: "kanali.io/v1",
-				Kind:       "APIKey",
+				Kind:       "ApiKey",
 			},
 			ObjectMeta: api.ObjectMeta{
 				Name:      viper.GetString("name"),
