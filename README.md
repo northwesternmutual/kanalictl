@@ -8,7 +8,7 @@
 
 ```sh
 # replace 'darwin' and 'amd64' with your OS and ARCH
-$ curl -sO https://s3.amazonaws.com/kanalictl/release/$(curl -s https://s3.amazonaws.com/kanalictl/release/latest.txt)/darwin/amd64/kanalictl
+$ curl -O https://s3.amazonaws.com/kanalictl/release/$(curl -s https://s3.amazonaws.com/kanalictl/release/latest.txt)/darwin/amd64/kanalictl
 $ chmod +x kanalictl
 $ sudo mv kanalictl /usr/local/bin/kanalictl
 $ kanalictl -h
