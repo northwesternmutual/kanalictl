@@ -32,7 +32,8 @@ func init() {
 	viper.AddConfigPath(".")
 	viper.AddConfigPath("$HOME/.kanalictl/")
 	viper.AddConfigPath("/etc/kanalictl/")
-	viper.ReadInConfig()
+	if err := viper.ReadInConfig(); err != nil {
+	}
 }
 
 func main() {
