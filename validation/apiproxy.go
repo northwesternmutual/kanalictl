@@ -78,7 +78,7 @@ func validateHosts(hosts []spec.Host) error {
 
 	for _, host := range hosts {
 		if len(host.SSL.SecretName) < 1 {
-			continue
+			return errors.New("ssl name must be defined")
 		}
 		if len(host.Name) < 1 {
 			return errors.New("host name must be defined if ssl defined")

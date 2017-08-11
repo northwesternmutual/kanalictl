@@ -58,7 +58,7 @@ func TestValidateAPIProxy(t *testing.T) {
 	// test host stuff
 	testProxy.Spec.Hosts[1] = spec.Host{SSL: spec.SSL{SecretName: "mySecretOne"}}
 	assert.Equal(ValidateAPIProxy(testProxy, mockClient, "").Error(), "host name must be defined if ssl defined")
-	testProxy.Spec.Hosts[1] = spec.Host{Name: "bar.foo.com"}
+	testProxy.Spec.Hosts[1] = spec.Host{Name: "bar.foo.com", SSL: spec.SSL{SecretName: "mySecretOne"}}
 
 	// test service stuff
 	testProxy.Spec.Service.Port = -1
@@ -106,6 +106,9 @@ func getTestAPIProxy() spec.APIProxy {
 				},
 				{
 					Name: "bar.foo.com",
+					SSL: spec.SSL{
+						SecretName: "mySecretTwo",
+					},
 				},
 			},
 			Service: spec.Service{
