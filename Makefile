@@ -27,7 +27,7 @@ $(BINARY): $(ALL_SRC) test fmt lint
 .PHONY: install
 install:
 	glide --version || go get github.com/Masterminds/glide
-	glide install
+	glide install --strip-vendor
 
 .PHONY: build
 build:
