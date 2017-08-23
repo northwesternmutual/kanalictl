@@ -3,6 +3,7 @@
 set -e
 
 if [[ $TRAVIS_TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  sed -ie "s/changeme/`echo $TRAVIS_TAG`/g" cmd/version.go
   gox
   echo $TRAVIS_TAG >> latest.txt
   aws s3 mv latest.txt $S3_BASE_PATH/latest.txt
