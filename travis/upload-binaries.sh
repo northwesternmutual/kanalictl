@@ -4,7 +4,19 @@ set -e
 
 if [[ $TRAVIS_TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
   sed -ie "s/changeme/`echo $TRAVIS_TAG`/g" cmd/version.go
-  gox
+  gox -osarch="darwin/386"
+  gox -osarch="darwin/amd64"
+  gox -osarch="linux/386"
+  gox -osarch="linux/amd64"
+  gox -osarch="linux/arm"
+  gox -osarch="freebsd/386"
+  gox -osarch="freebsd/amd64"
+  gox -osarch="freebsd/arm"
+  gox -osarch="openbsd/386"
+  gox -osarch="openbsd/amd64"
+  gox -osarch="netbsd/386"
+  gox -osarch="netbsd/amd64"
+  gox -osarch="netbsd/arm"
   echo $TRAVIS_TAG >> latest.txt
   aws s3 mv latest.txt $S3_BASE_PATH/latest.txt
   aws s3 mv kanalictl_darwin_386 $S3_BASE_PATH/$TRAVIS_TAG/darwin/386/kanalictl
@@ -17,8 +29,6 @@ if [[ $TRAVIS_TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
   aws s3 mv kanalictl_freebsd_arm $S3_BASE_PATH/$TRAVIS_TAG/freebsd/arm/kanalictl
   aws s3 mv kanalictl_openbsd_386 $S3_BASE_PATH/$TRAVIS_TAG/openbsd/386/kanalictl
   aws s3 mv kanalictl_openbsd_amd64 $S3_BASE_PATH/$TRAVIS_TAG/openbsd/amd64/kanalictl
-  aws s3 mv kanalictl_windows_386.exe $S3_BASE_PATH/$TRAVIS_TAG/windows/386/kanalictl.exe
-  aws s3 mv kanalictl_windows_amd64.exe $S3_BASE_PATH/$TRAVIS_TAG/windows/amd64/kanalictl.exe
   aws s3 mv kanalictl_netbsd_386 $S3_BASE_PATH/$TRAVIS_TAG/netbsd/386/kanalictl
   aws s3 mv kanalictl_netbsd_amd64 $S3_BASE_PATH/$TRAVIS_TAG/netbsd/amd64/kanalictl
   aws s3 mv kanalictl_netbsd_arm $S3_BASE_PATH/$TRAVIS_TAG/netbsd/arm/kanalictl
