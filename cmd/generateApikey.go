@@ -46,7 +46,7 @@ import (
 
 const (
 	label       = "kanali"
-	apiKeyBytes = 32
+	apiKeyBytes = 16 // 128 bits
 )
 
 func init() {
@@ -78,10 +78,10 @@ var generateAPIKeyCmd = &cobra.Command{
 
 		apiKey := createRandByteSlice(apiKeyBytes)
 
-		if len(viper.GetString("apikey")) == apiKeyBytes {
+		if len(viper.GetString("apikey")) == 32 {
 			apiKey = []byte(viper.GetString("apikey"))
 		} else if len(viper.GetString("apikey")) > 0 {
-			logrus.Fatalf("apikey must be %v characters long", apiKeyBytes)
+			logrus.Fatalf("apikey must be %d characters long", 32)
 			os.Exit(1)
 		}
 
@@ -155,6 +155,14 @@ func displayAPIKey(key []byte) error {
 
 	fmt.Print("Here is your api key (you will only see this once): ")
 	c := color.New(color.FgCyan).Add(color.Bold)
+
+  if len(viper.GetString("apikey")) == 32 {
+    if _, err := c.Println(viper.GetString("apikey")); err != nil {
+  		return err
+  	}
+    return nil
+  }
+
 	if _, err := c.Println(hex.EncodeToString(key)); err != nil {
 		return err
 	}
