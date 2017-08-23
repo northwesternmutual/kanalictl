@@ -21,8 +21,13 @@
 package controller
 
 import (
+	"bufio"
+	"bytes"
 	"errors"
+	"fmt"
+	"io"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"github.com/ghodss/yaml"
@@ -30,53 +35,100 @@ import (
 	"github.com/northwesternmutual/kanali/spec"
 	"github.com/northwesternmutual/kanalictl/utils"
 	"github.com/northwesternmutual/kanalictl/validation"
+	k8sYaml "k8s.io/apimachinery/pkg/util/yaml"
 	"k8s.io/kubernetes/pkg/api/unversioned"
 )
 
 // CreateOrApply validates a spec and then performs either a create or apply
-func CreateOrApply(op, path string) (string, int) {
+func CreateOrApply(op, path string) int {
 
 	// check if file was passed in
 	if path == "" {
-		return "file must be specified", 1
+		fmt.Println("file must be specified")
+		return 1
 	}
 
 	// turn potential relative path into absolute path
 	absPath, err := filepath.Abs(path)
 	if err != nil {
-		return err.Error(), 1
+		fmt.Println(err.Error())
+		return 1
 	}
 
 	// attempt to parse YAML file
 	yamlData, err := ioutil.ReadFile(absPath)
 	if err != nil {
-		return "file is not a valid YAML file", 1
+		fmt.Println("file is not a valid YAML file")
+		return 1
 	}
 
-	kind, err := getKind(yamlData)
+	yamlReader := k8sYaml.NewYAMLReader(bufio.NewReader(bytes.NewReader(yamlData)))
+
+	var document []byte
+	document, err = yamlReader.Read()
+	if err != nil {
+		fmt.Println("could not read yaml file")
+		return 1
+	}
+
+	for {
+		msg, code := handleDocument(document, op)
+		if code != 0 {
+			fmt.Println(msg)
+			return code
+		}
+		fmt.Print(msg)
+		document, err = yamlReader.Read()
+		if err != nil && err != io.EOF {
+			fmt.Println("could not read yaml file")
+			return 1
+		} else if err != nil && err == io.EOF {
+			return 0
+		}
+	}
+
+}
+
+func handleDocument(data []byte, op string) (string, int) {
+	kind, err := getKind(data)
 	if err != nil {
 		return err.Error(), 1
 	}
 
 	switch kind {
-	case "APIKey":
-		if err := handleAPIKey(yamlData); err != nil {
+	case "ApiKey":
+		if err := handleAPIKey(data); err != nil {
 			return err.Error(), 1
 		}
-	case "APIProxy":
-		if err := handleAPIProxy(yamlData); err != nil {
+	case "ApiProxy":
+		if err := handleAPIProxy(data); err != nil {
 			return err.Error(), 1
 		}
-	case "APIKeyBinding":
-		if err := handleAPIKeyBinding(yamlData); err != nil {
+	case "ApiKeyBinding":
+		if err := handleAPIKeyBinding(data); err != nil {
 			return err.Error(), 1
 		}
 	default:
 		return "please use kubectl for this configuration file", 1
 	}
 
-	return utils.Execute("kubectl", op, "-f", path)
+	tmpfile, err := ioutil.TempFile("", "kanalictl")
+	if err != nil {
+		return err.Error(), 1
+	}
+	defer func() {
+		if err := os.Remove(tmpfile.Name()); err != nil {
+			fmt.Printf("could not remove temp file %s", tmpfile.Name())
+		}
+	}()
+	if _, err := tmpfile.Write(data); err != nil {
+		return err.Error(), 1
+	}
+	if err := tmpfile.Close(); err != nil {
+		return err.Error(), 1
+	}
 
+	return utils.Execute("kubectl", op, "-f", tmpfile.Name())
 }
 
 func handleAPIKeyBinding(data []byte) error {

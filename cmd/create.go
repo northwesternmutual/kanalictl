@@ -43,8 +43,6 @@ var createCmd = &cobra.Command{
 			fmt.Print(err.Error())
 			os.Exit(1)
 		}
-		response, code := controller.CreateOrApply("create", path)
-		fmt.Print(response)
-		os.Exit(code)
+		os.Exit(controller.CreateOrApply("create", path))
 	},
 }

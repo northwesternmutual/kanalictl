@@ -12,3 +12,4 @@ examples/
 .cover/
 *.log
 kanalictl.yaml
+test*.yml

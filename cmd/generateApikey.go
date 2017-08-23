@@ -46,7 +46,7 @@ import (
 
 const (
 	label       = "kanali"
-	apiKeyBytes = 16 // 128 bits
+	apiKeyBytes = 32
 )
 
 func init() {

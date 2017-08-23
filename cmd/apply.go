@@ -43,8 +43,6 @@ var applyCmd = &cobra.Command{
 			fmt.Print(err.Error())
 			os.Exit(1)
 		}
-		response, code := controller.CreateOrApply("apply", path)
-		fmt.Print(response)
-		os.Exit(code)
+		os.Exit(controller.CreateOrApply("apply", path))
 	},
 }
