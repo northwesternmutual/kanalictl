@@ -156,12 +156,12 @@ func displayAPIKey(key []byte) error {
 	fmt.Print("Here is your api key (you will only see this once): ")
 	c := color.New(color.FgCyan).Add(color.Bold)
 
-  if len(viper.GetString("apikey")) == 32 {
-    if _, err := c.Println(viper.GetString("apikey")); err != nil {
-  		return err
-  	}
-    return nil
-  }
+	if len(viper.GetString("apikey")) == 32 {
+		if _, err := c.Println(viper.GetString("apikey")); err != nil {
+			return err
+		}
+		return nil
+	}
 
 	if _, err := c.Println(hex.EncodeToString(key)); err != nil {
 		return err
