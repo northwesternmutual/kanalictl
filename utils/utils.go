@@ -21,9 +21,12 @@
 package utils
 
 import (
+  "errors"
 	"strings"
 
+  "github.com/ghodss/yaml"
 	"github.com/spf13/pflag"
+  "k8s.io/kubernetes/pkg/api/unversioned"
 )
 
 // GetNamespace retrieves a specific namespace specificed
@@ -53,5 +56,18 @@ func JoinArray(arr []string) string {
 	}
 
 	return strings.Join(arr, ",")
+
+}
+
+func GetKind(data []byte) (string, error) {
+
+	var meta unversioned.TypeMeta
+
+	err := yaml.Unmarshal(data, &meta)
+	if err != nil {
+		return "", errors.New("found a non-kubernetes yaml file")
+	}
+
+	return meta.Kind, nil
 
 }

@@ -24,10 +24,8 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha256"
-	"crypto/x509"
 	"encoding/hex"
 	"encoding/json"
-	"encoding/pem"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -38,6 +36,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/ghodss/yaml"
 	"github.com/northwesternmutual/kanali/spec"
+  "github.com/northwesternmutual/kanalictl/utils"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"k8s.io/kubernetes/pkg/api"
@@ -45,7 +44,6 @@ import (
 )
 
 const (
-	label       = "kanali"
 	apiKeyBytes = 16 // 128 bits
 )
 
@@ -70,7 +68,7 @@ var generateAPIKeyCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		publicKey, err := getPublicKey(viper.GetString("encrypt_key"))
+		publicKey, err := utils.GetPublicKey(viper.GetString("encrypt_key"))
 		if err != nil {
 			logrus.Fatalf("%s", err.Error())
 			os.Exit(1)
@@ -85,7 +83,7 @@ var generateAPIKeyCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		ciphertext, err := rsa.EncryptOAEP(sha256.New(), rand.Reader, publicKey, apiKey, []byte(label))
+		ciphertext, err := rsa.EncryptOAEP(sha256.New(), rand.Reader, publicKey, apiKey, []byte(utils.LABEL))
 		if err != nil {
 			logrus.Fatal("error encrypting your api key - please try again")
 			os.Exit(1)
@@ -228,38 +226,5 @@ func getOutFile(f string) (string, error) {
 		return "", errors.New("please double check the format of your outfile and try again")
 
 	}
-
-}
-
-func getPublicKey(location string) (pubKey *rsa.PublicKey, returnError error) {
-
-	defer func() {
-		if r := recover(); r != nil {
-			returnError = errors.New("error parsing public key")
-		}
-	}()
-
-	var keyBytes []byte
-
-	// read in public key
-	keyBytes, err := ioutil.ReadFile(location)
-	if err != nil {
-		if location == "" {
-			return nil, errors.New("public key not specified")
-		}
-		keyBytes = []byte(location)
-	}
-
-	// create a pem block from the public key provided
-	block, _ := pem.Decode(keyBytes)
-	// parse the pem block into a public key
-	publicKeyInterface, err := x509.ParsePKIXPublicKey(block.Bytes)
-	// type assertion
-	publicKey, ok := publicKeyInterface.(*rsa.PublicKey)
-	if !ok {
-		return nil, errors.New("error parsing public key")
-	}
-
-	return publicKey, nil
 
 }
