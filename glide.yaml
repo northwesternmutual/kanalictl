@@ -2,14 +2,9 @@ package: github.com/northwesternmutual/kanalictl
 import:
 - package: github.com/spf13/cobra
 - package: github.com/northwesternmutual/kanali
-  version: v1.0.1
-  subpackages:
-  - controller
-  - spec
+  version: v1.2.0
 - package: github.com/gosuri/uitable
 - package: gopkg.in/yaml.v2
-- package: github.com/fatih/color
-  version: v1.4.1
 - package: k8s.io/apimachinery/pkg/util/yaml
 - package: k8s.io/kubernetes
   version: v1.5.7
@@ -19,6 +14,6 @@ import:
   version: v1.1.4
 - package: github.com/ghodss/yaml
 - package: github.com/spf13/viper
-  version: be5ff3e4840cf692388bde7a057595a474ef379e
+  version: v1.0.0
   subpackages:
   - assert
