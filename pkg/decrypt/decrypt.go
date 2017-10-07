@@ -9,9 +9,11 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"github.com/ghodss/yaml"
 	"github.com/northwesternmutual/kanali/spec"
@@ -61,14 +63,31 @@ func renderResults(results []result) {
 
 func decryptFiles(fileList []string, key *rsa.PrivateKey) []result {
 	allResults := []result{}
+	resultsChan := make(chan []result)
+
+	wg := sync.WaitGroup{}
+	wg.Add(len(fileList))
+
 	for _, file := range fileList {
-		allResults = append(allResults, decryptFile(file, key)...)
+		go func(file string) {
+			resultsChan <- decryptFile(file, key)
+		}(file)
 	}
+	go func() {
+		for r := range resultsChan {
+			allResults = append(allResults, r...)
+			wg.Done()
+		}
+	}()
+
+	wg.Wait()
 	return allResults
 }
 
 func decryptFile(file string, key *rsa.PrivateKey) []result {
 	fileResults := []result{}
+	fileResultsChan := make(chan result)
+	wg := sync.WaitGroup{}
 
 	fileData, err := ioutil.ReadFile(file)
 	if err != nil {
@@ -79,18 +98,34 @@ func decryptFile(file string, key *rsa.PrivateKey) []result {
 
 	for {
 		doc, err := reader.Read()
-		if err != nil {
+		if err != nil && err != io.EOF {
 			return fileResults
+		} else if err != nil && err == io.EOF {
+			break
 		}
-		name, data, err := decryptKey(doc, key)
-		if err != nil {
-			continue
-		}
-		fileResults = append(fileResults, result{
-			name: name,
-			data: data,
-		})
+
+		wg.Add(1)
+		go func(doc []byte) {
+			name, data, err := decryptKey(doc, key)
+			if err != nil {
+				wg.Done()
+			} else {
+				fileResultsChan <- result{
+					name: name,
+					data: data,
+				}
+			}
+		}(doc)
+		go func() {
+			for r := range fileResultsChan {
+				fileResults = append(fileResults, r)
+				wg.Done()
+			}
+		}()
 	}
+
+	wg.Wait()
+	return fileResults
 }
 
 func decryptKey(data []byte, key *rsa.PrivateKey) (string, string, error) {

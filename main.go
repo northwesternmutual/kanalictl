@@ -23,6 +23,7 @@ package main
 import (
 	"github.com/spf13/viper"
 	"os"
+	"runtime"
 
 	"github.com/northwesternmutual/kanalictl/cmd"
 )
@@ -37,6 +38,7 @@ func init() {
 }
 
 func main() {
+	runtime.GOMAXPROCS(runtime.NumCPU())
 	if err := cmd.RootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
