@@ -18,28 +18,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package main
+package generate
 
 import (
-	"github.com/spf13/viper"
-	"os"
-	"runtime"
+	"testing"
 
-	"github.com/northwesternmutual/kanalictl/cmd"
+	"github.com/stretchr/testify/assert"
 )
 
-func init() {
-	viper.SetConfigName("kanalictl")
-	viper.AddConfigPath(".")
-	viper.AddConfigPath("$HOME/.kanalictl/")
-	viper.AddConfigPath("/etc/kanalictl/")
-	if err := viper.ReadInConfig(); err != nil {
-	}
-}
+func TestGenerateKeyData(t *testing.T) {
+	result, _ := generateKeyData("foo", 1)
+	assert.Equal(t, result, []byte("foo"))
 
-func main() {
-	runtime.GOMAXPROCS(runtime.NumCPU())
-	if err := cmd.RootCmd.Execute(); err != nil {
-		os.Exit(1)
-	}
+	_, err := generateKeyData("", 0)
+	assert.Equal(t, err.Error(), "key length must be an greater than zero")
+
+	resultOne, _ := generateKeyData("", 6)
+	resultTwo, _ := generateKeyData("", 6)
+	assert.Equal(t, len(resultOne), 6)
+	assert.NotEqual(t, resultOne, resultTwo)
 }

@@ -18,28 +18,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package main
+package cmd
 
 import (
-	"github.com/spf13/viper"
-	"os"
-	"runtime"
-
-	"github.com/northwesternmutual/kanalictl/cmd"
+	"github.com/spf13/cobra"
 )
 
 func init() {
-	viper.SetConfigName("kanalictl")
-	viper.AddConfigPath(".")
-	viper.AddConfigPath("$HOME/.kanalictl/")
-	viper.AddConfigPath("/etc/kanalictl/")
-	if err := viper.ReadInConfig(); err != nil {
-	}
+	RootCmd.AddCommand(apiKeyCmd)
 }
 
-func main() {
-	runtime.GOMAXPROCS(runtime.NumCPU())
-	if err := cmd.RootCmd.Execute(); err != nil {
-		os.Exit(1)
-	}
+var apiKeyCmd = &cobra.Command{
+	Use:   `apikey`,
+	Short: `Preforms operations on API key resources`,
+	Long:  `Preforms operations on API key resources`,
 }

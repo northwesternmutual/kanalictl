@@ -33,10 +33,3 @@ $ ./kanalictl --help
 $ kanalictl [command] [subcommand] [flags]
 $ kanalictl -h
 ```
-
-# Config
-Kanalictl can be configured via a config file named `kanalictl`. This file may be of type `YAML`, `JSON`, `TOML`. Kanalictl will look in the following file system locations for this file (in order of precedence):
-
-###### `.`
-###### `$HOME/.kanalictl/`
-###### `/etc/kanalictl/`

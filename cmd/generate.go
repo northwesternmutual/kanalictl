@@ -21,49 +21,157 @@
 package cmd
 
 import (
+	"crypto/rsa"
+	"crypto/x509"
+	"encoding/pem"
+	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
+	"path/filepath"
 
+	"github.com/Sirupsen/logrus"
+	"github.com/northwesternmutual/kanali/spec"
+	"github.com/northwesternmutual/kanalictl/config"
+	"github.com/northwesternmutual/kanalictl/pkg/generate"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"k8s.io/kubernetes/pkg/api"
+	"k8s.io/kubernetes/pkg/api/unversioned"
 )
 
 func init() {
-	generateCmd.PersistentFlags().StringP("name", "n", "", "name of the api key")
-	generateCmd.PersistentFlags().StringP("namespace", "s", "default", "the namespace the api key should belong to")
-	generateCmd.PersistentFlags().StringP("encrypt_key", "k", "", "location of public key to use during encryption")
-	generateCmd.PersistentFlags().StringP("out-file", "o", "", "location to save Kubernetes config to")
-	generateCmd.PersistentFlags().StringP("apikey", "a", "", "encrypt existing apikey")
+	generateCmd.Flags().StringP(config.FlagRSAPublicKeyFile.Long, config.FlagRSAPublicKeyFile.Short, config.FlagRSAPublicKeyFile.Value.(string), config.FlagRSAPublicKeyFile.Usage)
+	generateCmd.Flags().StringP(config.FlagKeyName.Long, config.FlagKeyName.Short, config.FlagKeyName.Value.(string), config.FlagKeyName.Usage)
+	generateCmd.Flags().StringP(config.FlagKeyOutFile.Long, config.FlagKeyOutFile.Short, config.FlagKeyOutFile.Value.(string), config.FlagKeyOutFile.Usage)
+	generateCmd.Flags().IntP(config.FlagKeyLength.Long, config.FlagKeyLength.Short, config.FlagKeyLength.Value.(int), config.FlagKeyLength.Usage)
+	generateCmd.Flags().StringP(config.FlagKeyData.Long, config.FlagKeyData.Short, config.FlagKeyData.Value.(string), config.FlagKeyData.Usage)
 
-	if err := viper.BindPFlag("name", generateCmd.PersistentFlags().Lookup("name")); err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
+	if err := viper.BindPFlag(config.FlagKeyData.Long, generateCmd.Flags().Lookup(config.FlagKeyData.Long)); err != nil {
+		panic(err)
 	}
-	if err := viper.BindPFlag("namespace", generateCmd.PersistentFlags().Lookup("namespace")); err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
+	if err := viper.BindPFlag(config.FlagRSAPublicKeyFile.Long, generateCmd.Flags().Lookup(config.FlagRSAPublicKeyFile.Long)); err != nil {
+		panic(err)
 	}
-	if err := viper.BindPFlag("encrypt_key", generateCmd.PersistentFlags().Lookup("encrypt_key")); err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
+	if err := viper.BindPFlag(config.FlagKeyName.Long, generateCmd.Flags().Lookup(config.FlagKeyName.Long)); err != nil {
+		panic(err)
 	}
-	if err := viper.BindPFlag("out-file", generateCmd.PersistentFlags().Lookup("out-file")); err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
+	if err := viper.BindPFlag(config.FlagKeyOutFile.Long, generateCmd.Flags().Lookup(config.FlagKeyOutFile.Long)); err != nil {
+		panic(err)
 	}
-	if err := viper.BindPFlag("apikey", generateCmd.PersistentFlags().Lookup("apikey")); err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
+	if err := viper.BindPFlag(config.FlagKeyLength.Long, generateCmd.Flags().Lookup(config.FlagKeyLength.Long)); err != nil {
+		panic(err)
 	}
 
-	viper.SetDefault("namespace", "default")
-	viper.SetDefault("encrypt_key", "")
+	viper.SetDefault(config.FlagKeyData.Long, config.FlagKeyData.Value)
+	viper.SetDefault(config.FlagRSAPublicKeyFile.Long, config.FlagRSAPublicKeyFile.Value)
+	viper.SetDefault(config.FlagKeyName.Long, config.FlagKeyName.Value)
+	viper.SetDefault(config.FlagKeyOutFile.Long, config.FlagKeyOutFile.Value)
+	viper.SetDefault(config.FlagKeyLength.Long, config.FlagKeyLength.Value)
 
-	RootCmd.AddCommand(generateCmd)
+	apiKeyCmd.AddCommand(generateCmd)
 }
 
 var generateCmd = &cobra.Command{
 	Use:   `generate`,
-	Short: `generate an api key`,
-	Long:  `generate an api key along with the corresponding Kubernetes config containing the encrypted api key`,
+	Short: `Creates an API key`,
+	Long:  `Creates an API key`,
+	Run: func(cmd *cobra.Command, args []string) {
+
+		outFileName, err := getOutFile(viper.GetString(config.FlagKeyOutFile.GetLong()))
+		if err != nil {
+			logrus.Fatalf("%s", err.Error())
+			os.Exit(1)
+		}
+
+		publicKey, err := getPublicKey(viper.GetString(config.FlagRSAPublicKeyFile.GetLong()))
+		if err != nil {
+			logrus.Fatalf("%s", err.Error())
+			os.Exit(1)
+		}
+
+		unencryptedKeyData, encryptedKeyData, err := generate.Key(viper.GetString(config.FlagKeyName.GetLong()), viper.GetString(config.FlagKeyData.GetLong()), viper.GetInt(config.FlagKeyLength.GetLong()), publicKey)
+		if err != nil {
+			logrus.Fatalf("%s", err.Error())
+			os.Exit(1)
+		}
+
+		keyCRD := spec.APIKey{
+			TypeMeta: unversioned.TypeMeta{
+				APIVersion: "kanali.io/v1",
+				Kind:       "ApiKey",
+			},
+			ObjectMeta: api.ObjectMeta{
+				Name:      viper.GetString(config.FlagKeyName.GetLong()),
+				Namespace: "default",
+			},
+			Spec: spec.APIKeySpec{
+				APIKeyData: fmt.Sprintf("%x", encryptedKeyData),
+			},
+		}
+
+		if err := generate.Display(len(outFileName) < 1, unencryptedKeyData, keyCRD); err != nil {
+			logrus.Fatalf("%s", err.Error())
+			os.Exit(1)
+		}
+
+		if err := generate.Write(outFileName, keyCRD); err != nil {
+			logrus.Fatalf("%s", err.Error())
+			os.Exit(1)
+		}
+
+		os.Exit(0)
+	},
+}
+
+func getOutFile(f string) (string, error) {
+	if len(f) < 1 {
+		return "", nil
+	}
+
+	ext := filepath.Ext(f)
+	if len(ext) < 1 {
+		return f + ".yaml", nil
+	}
+
+	switch ext {
+	case ".yaml", ".yml", ".json":
+	default:
+		return "", errors.New("out file just be either json or yaml format")
+	}
+
+	return f, nil
+}
+
+func getPublicKey(location string) (pubKey *rsa.PublicKey, returnError error) {
+
+	defer func() {
+		if r := recover(); r != nil {
+			returnError = errors.New("error parsing public key")
+		}
+	}()
+
+	var keyBytes []byte
+
+	// read in public key
+	keyBytes, err := ioutil.ReadFile(location)
+	if err != nil {
+		if location == "" {
+			return nil, errors.New("public key not specified")
+		}
+		keyBytes = []byte(location)
+	}
+
+	// create a pem block from the public key provided
+	block, _ := pem.Decode(keyBytes)
+	// parse the pem block into a public key
+	publicKeyInterface, err := x509.ParsePKIXPublicKey(block.Bytes)
+	// type assertion
+	publicKey, ok := publicKeyInterface.(*rsa.PublicKey)
+	if !ok {
+		return nil, errors.New("error parsing public key")
+	}
+
+	return publicKey, nil
+
 }

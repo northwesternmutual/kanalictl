@@ -66,11 +66,7 @@ func ValidateAPIProxy(proxy spec.APIProxy, client utils.HTTPClient, host string)
 	}
 
 	// validate plugins
-	if err := validatePlugins(proxy.Spec.Plugins); err != nil {
-		return err
-	}
-
-	return nil
+	return validatePlugins(proxy.Spec.Plugins)
 
 }
 

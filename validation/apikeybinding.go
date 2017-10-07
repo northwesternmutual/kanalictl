@@ -32,7 +32,6 @@ import (
 
 // ValidateAPIKeyBinding performs validation on an APIKeyBinding
 func ValidateAPIKeyBinding(binding spec.APIKeyBinding, client utils.HTTPClient, host string) error {
-
 	if binding.Spec.APIProxyName == "" {
 		return errors.New("proxy name must be defined")
 	}
@@ -43,12 +42,7 @@ func ValidateAPIKeyBinding(binding spec.APIKeyBinding, client utils.HTTPClient, 
 		return err
 	}
 
-	if err := validateKeys(binding.Spec.Keys); err != nil {
-		return err
-	}
-
-	return nil
-
+	return validateKeys(binding.Spec.Keys)
 }
 
 func validateKeys(keys []spec.Key) error {

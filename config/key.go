@@ -18,28 +18,46 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package main
+package config
 
 import (
-	"github.com/spf13/viper"
-	"os"
-	"runtime"
-
-	"github.com/northwesternmutual/kanalictl/cmd"
+	"github.com/northwesternmutual/kanali/config"
 )
 
-func init() {
-	viper.SetConfigName("kanalictl")
-	viper.AddConfigPath(".")
-	viper.AddConfigPath("$HOME/.kanalictl/")
-	viper.AddConfigPath("/etc/kanalictl/")
-	if err := viper.ReadInConfig(); err != nil {
+var (
+	// FlagKeyName specifies the API key name.
+	FlagKeyName = config.Flag{
+		Long:  "key.name",
+		Short: "",
+		Value: "",
+		Usage: "Name of API data.",
 	}
-}
-
-func main() {
-	runtime.GOMAXPROCS(runtime.NumCPU())
-	if err := cmd.RootCmd.Execute(); err != nil {
-		os.Exit(1)
+	// FlagKeyData specifies existing API key data.
+	FlagKeyData = config.Flag{
+		Long:  "key.data",
+		Short: "",
+		Value: "",
+		Usage: "Existing API key data.",
 	}
-}
+	// FlagKeyOutFile specifies path to RSA public key.
+	FlagKeyOutFile = config.Flag{
+		Long:  "key.out_file",
+		Short: "",
+		Value: "",
+		Usage: "Existing API key data.",
+	}
+	// FlagKeyInFile specifies path to file or directory containing API key resources.
+	FlagKeyInFile = config.Flag{
+		Long:  "key.in_file",
+		Short: "",
+		Value: "",
+		Usage: "Path to file or directory containing API key resources",
+	}
+	// FlagKeyLength specifies the desired length of the generated API key.
+	FlagKeyLength = config.Flag{
+		Long:  "key.length",
+		Short: "",
+		Value: 32,
+		Usage: "Existing API key data.",
+	}
+)

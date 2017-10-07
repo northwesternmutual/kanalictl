@@ -132,7 +132,6 @@ func handleDocument(data []byte, op string) (string, int) {
 }
 
 func handleAPIKeyBinding(data []byte) error {
-
 	var binding spec.APIKeyBinding
 
 	err := yaml.Unmarshal(data, &binding)
@@ -145,16 +144,10 @@ func handleAPIKeyBinding(data []byte) error {
 		return err
 	}
 
-	if err := validation.ValidateAPIKeyBinding(binding, ctlr.RestClient.Client, ctlr.MasterHost); err != nil {
-		return err
-	}
-
-	return nil
-
+	return validation.ValidateAPIKeyBinding(binding, ctlr.RestClient.Client, ctlr.MasterHost)
 }
 
 func handleAPIProxy(data []byte) error {
-
 	var proxy spec.APIProxy
 
 	err := yaml.Unmarshal(data, &proxy)
@@ -167,28 +160,17 @@ func handleAPIProxy(data []byte) error {
 		return err
 	}
 
-	if err := validation.ValidateAPIProxy(proxy, ctlr.RestClient.Client, ctlr.MasterHost); err != nil {
-		return err
-	}
-
-	return nil
-
+	return validation.ValidateAPIProxy(proxy, ctlr.RestClient.Client, ctlr.MasterHost)
 }
 
 func handleAPIKey(data []byte) error {
-
 	var apikey spec.APIKey
 
 	err := yaml.Unmarshal(data, &apikey)
 	if err != nil {
 		return err
 	}
-	if err := validation.ValidateAPIKey(apikey); err != nil {
-		return err
-	}
-
-	return nil
-
+	return validation.ValidateAPIKey(apikey)
 }
 
 func getKind(data []byte) (string, error) {

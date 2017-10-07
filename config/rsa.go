@@ -18,22 +18,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package cmd
+package config
 
 import (
-	"github.com/spf13/cobra"
+	"github.com/northwesternmutual/kanali/config"
 )
 
-func init() {
-	getCmd.PersistentFlags().StringP("namespace", "n", "default", "Show resources in a specific namespace")
-	getCmd.PersistentFlags().BoolP("all-namespaces", "", false, "Show resources in all namespaces")
-	getCmd.PersistentFlags().StringP("out", "o", "", "Output format. One of: json|yaml|wide")
-
-	RootCmd.AddCommand(getCmd)
-}
-
-var getCmd = &cobra.Command{
-	Use:   `get`,
-	Short: `Display all resources in one or every namespaces.`,
-	Long:  `Display all resources in one or every namespaces.`,
-}
+var (
+	// FlagRSAPublicKeyFile specifies path to RSA public key.
+	FlagRSAPublicKeyFile = config.Flag{
+		Long:  "rsa.public_key_file",
+		Short: "",
+		Value: "",
+		Usage: "Path to RSA public key.",
+	}
+	// FlagRSAPrivateKeyFile specifies path to RSA private key.
+	FlagRSAPrivateKeyFile = config.Flag{
+		Long:  "rsa.private_key_file",
+		Short: "",
+		Value: "",
+		Usage: "Path to RSA private key.",
+	}
+)
