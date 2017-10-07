@@ -30,6 +30,6 @@ func init() {
 
 var apiKeyCmd = &cobra.Command{
 	Use:   `apikey`,
-	Short: ``,
-	Long:  ``,
+	Short: `Preforms operations on API key resources`,
+	Long:  `Preforms operations on API key resources`,
 }

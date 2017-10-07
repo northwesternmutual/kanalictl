@@ -4,6 +4,7 @@ import:
 - package: github.com/northwesternmutual/kanali
   version: v1.2.0
 - package: github.com/gosuri/uitable
+- package: github.com/olekukonko/tablewriter
 - package: gopkg.in/yaml.v2
 - package: k8s.io/apimachinery/pkg/util/yaml
 - package: k8s.io/kubernetes

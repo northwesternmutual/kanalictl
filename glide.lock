@@ -1,5 +1,5 @@
-hash: 58443e2cfaf3488bbd3ea3e0b01dbe85c457452f436c43469a184f3fa3acf9a6
-updated: 2017-10-06T13:38:07.681737812-05:00
+hash: ba6eae9fea768d9f12d1bc9fb9572f2f682154b0875e29a57d7be7046ad631de
+updated: 2017-10-07T16:19:47.608902-05:00
 imports:
 - name: cloud.google.com/go
   version: 3b1ae45394a234c385be014e9a488f2bb6eef821
@@ -68,8 +68,6 @@ imports:
   version: 465937c80b3c07a7c7ad20cc934898646a91c1de
 - name: github.com/exponent-io/jsonpath
   version: d6023ce2651d8eafb5c75bb0c7167536102ec9f5
-- name: github.com/fatih/color
-  version: 9131ab34cf20d2f6d83fdc67168a5430d1c7dc23
 - name: github.com/fsnotify/fsnotify
   version: 4da3e2cfbabc9f751898f250b49f2439785783a1
 - name: github.com/ghodss/yaml
@@ -159,12 +157,6 @@ imports:
   - buffer
   - jlexer
   - jwriter
-- name: github.com/mattn/go-colorable
-  version: 5411d3eea5978e6cdc258b30de592b60df6aba96
-  repo: https://github.com/mattn/go-colorable
-- name: github.com/mattn/go-isatty
-  version: 57fdcb988a5c543893cc61bce354a6e24ab70022
-  repo: https://github.com/mattn/go-isatty
 - name: github.com/mattn/go-runewidth
   version: 97311d9f7767e3d6f422ea06661bc2c7a19e8a5d
 - name: github.com/mitchellh/mapstructure
@@ -176,6 +168,8 @@ imports:
   - controller
   - spec
   - utils
+- name: github.com/olekukonko/tablewriter
+  version: a7a4c189eb47ed33ce7b35f2880070a0c82a67d4
 - name: github.com/pborman/uuid
   version: ca53cad383cad2479bbba7f7a1a05797ec1386e4
 - name: github.com/pelletier/go-toml

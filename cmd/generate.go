@@ -43,17 +43,17 @@ import (
 func init() {
 	generateCmd.Flags().StringP(config.FlagRSAPublicKeyFile.Long, config.FlagRSAPublicKeyFile.Short, config.FlagRSAPublicKeyFile.Value.(string), config.FlagRSAPublicKeyFile.Usage)
 	generateCmd.Flags().StringP(config.FlagKeyName.Long, config.FlagKeyName.Short, config.FlagKeyName.Value.(string), config.FlagKeyName.Usage)
-	generateCmd.Flags().StringP(config.FlagKeyData.Long, config.FlagKeyData.Short, config.FlagKeyData.Value.(string), config.FlagKeyData.Usage)
 	generateCmd.Flags().StringP(config.FlagKeyOutFile.Long, config.FlagKeyOutFile.Short, config.FlagKeyOutFile.Value.(string), config.FlagKeyOutFile.Usage)
 	generateCmd.Flags().IntP(config.FlagKeyLength.Long, config.FlagKeyLength.Short, config.FlagKeyLength.Value.(int), config.FlagKeyLength.Usage)
+	generateCmd.Flags().StringP(config.FlagKeyData.Long, config.FlagKeyData.Short, config.FlagKeyData.Value.(string), config.FlagKeyData.Usage)
 
+	if err := viper.BindPFlag(config.FlagKeyData.Long, generateCmd.Flags().Lookup(config.FlagKeyData.Long)); err != nil {
+		panic(err)
+	}
 	if err := viper.BindPFlag(config.FlagRSAPublicKeyFile.Long, generateCmd.Flags().Lookup(config.FlagRSAPublicKeyFile.Long)); err != nil {
 		panic(err)
 	}
 	if err := viper.BindPFlag(config.FlagKeyName.Long, generateCmd.Flags().Lookup(config.FlagKeyName.Long)); err != nil {
-		panic(err)
-	}
-	if err := viper.BindPFlag(config.FlagKeyData.Long, generateCmd.Flags().Lookup(config.FlagKeyData.Long)); err != nil {
 		panic(err)
 	}
 	if err := viper.BindPFlag(config.FlagKeyOutFile.Long, generateCmd.Flags().Lookup(config.FlagKeyOutFile.Long)); err != nil {
@@ -63,9 +63,9 @@ func init() {
 		panic(err)
 	}
 
+	viper.SetDefault(config.FlagKeyData.Long, config.FlagKeyData.Value)
 	viper.SetDefault(config.FlagRSAPublicKeyFile.Long, config.FlagRSAPublicKeyFile.Value)
 	viper.SetDefault(config.FlagKeyName.Long, config.FlagKeyName.Value)
-	viper.SetDefault(config.FlagKeyData.Long, config.FlagKeyData.Value)
 	viper.SetDefault(config.FlagKeyOutFile.Long, config.FlagKeyOutFile.Value)
 	viper.SetDefault(config.FlagKeyLength.Long, config.FlagKeyLength.Value)
 
@@ -74,8 +74,8 @@ func init() {
 
 var generateCmd = &cobra.Command{
 	Use:   `generate`,
-	Short: ``,
-	Long:  ``,
+	Short: `Creates an API key`,
+	Long:  `Creates an API key`,
 	Run: func(cmd *cobra.Command, args []string) {
 
 		outFileName, err := getOutFile(viper.GetString(config.FlagKeyOutFile.GetLong()))
@@ -135,9 +135,7 @@ func getOutFile(f string) (string, error) {
 	}
 
 	switch ext {
-	case "yaml":
-	case "yml":
-	case "json":
+	case ".yaml", ".yml", ".json":
 	default:
 		return "", errors.New("out file just be either json or yaml format")
 	}
