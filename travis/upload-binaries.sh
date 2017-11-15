@@ -17,6 +17,7 @@ if [[ $TRAVIS_TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
   gox -osarch="netbsd/386"
   gox -osarch="netbsd/amd64"
   gox -osarch="netbsd/arm"
+  gox -osarch="windows/amd64"
   echo $TRAVIS_TAG >> latest.txt
   aws s3 mv latest.txt $S3_BASE_PATH/latest.txt
   aws s3 mv kanalictl_darwin_386 $S3_BASE_PATH/$TRAVIS_TAG/darwin/386/kanalictl
@@ -32,6 +33,7 @@ if [[ $TRAVIS_TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
   aws s3 mv kanalictl_netbsd_386 $S3_BASE_PATH/$TRAVIS_TAG/netbsd/386/kanalictl
   aws s3 mv kanalictl_netbsd_amd64 $S3_BASE_PATH/$TRAVIS_TAG/netbsd/amd64/kanalictl
   aws s3 mv kanalictl_netbsd_arm $S3_BASE_PATH/$TRAVIS_TAG/netbsd/arm/kanalictl
+  aws s3 mv kanalictl_windows_amd64.exe $S3_BASE_PATH/$TRAVIS_TAG/windows/amd64/kanalictl.exe
 fi
 
 exit 0
