@@ -1,3 +1,4 @@
+# DEPRECATED - no longer being maintained
 # kanalictl
 
 [![Travis](https://img.shields.io/travis/northwesternmutual/kanalictl/master.svg?style=flat-square)](https://travis-ci.org/northwesternmutual/kanalictl) [![Coveralls](https://img.shields.io/coveralls/northwesternmutual/kanalictl/master.svg?style=flat-square)](https://coveralls.io/github/northwesternmutual/kanalictl)
